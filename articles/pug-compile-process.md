@@ -1,6 +1,7 @@
-# 附錄：PUG 的編譯流程
-在解釋編譯流程之前，先簡單介紹一些 PUG 這東西。
+# 附錄A: PUG 的編譯流程
 
+跟解題流程有高度相關的才留在主文章。  
+這種相對比較細節的東西還是另外開一篇文章補充比較整潔。
 
 <!-- TOC depthfrom:2 orderedlist:false -->
 
@@ -12,6 +13,7 @@
 
 <!-- /TOC -->
 
+****
 
 ## 這是一套受歡迎的模板引擎
 ![](assets/pug1.png)
@@ -47,6 +49,8 @@ table.className#ID(attr="value")
 流程大致如下：
 ![](assets/pug2.png)
 
+（註：詞法分析器、語法分析器、編譯器底下的英文是 pug 的子套件名稱）
+
 ```
          下面這坨直接黑箱起來統稱編譯
 PUG -> (詞法分析 -> 語法分析 -> 編譯) -> JavaScript -> HTML
@@ -56,13 +60,12 @@ PUG -> (詞法分析 -> 語法分析 -> 編譯) -> JavaScript -> HTML
 > 編譯器 (compiler) 是一種電腦程式，它會將某種程式語言寫成的原始碼（原始語言）轉換成另一種程式語言（目標語言）。
 
 ### 如何使用漏洞？
-這段其實跟這篇文章沒有直接關係，純粹承接主文章用的而已。
-
 由於主文章在探討的是利用原型鍊污染達成目的，因此就這個結構來看的話，感覺每個環節都有機會成爲目標。不過實際嘗試污染攻擊後，會發現基本上只能透過一些「有定義屬性且在特定流程下該屬性沒有預設值(或是採用不嚴謹的比對或自動轉型)的情況」才可達成有效的污染攻擊。  
 
 很繞口？用程式碼來講可能比較直接點。
 
-[pollution-lib.js](scripts/pollution-lib.js)
+[pollution-lib.js](scripts/pollution-lib.js),
+[pollution-usage.js](scripts/pollution-usage.js)
 ```js
 // 此函式定義在 ./scripts/pollution-lib.js
 // 可從 ./scripts/pollution-usage.js 執行看到結果
@@ -82,8 +85,8 @@ function calc(data) {
 }
 ```
 
-
-
+這一小節其實跟這篇文章沒有直接關係，主要是承接下一篇用的而已。  
+下一篇是 [附錄B: AST 注入攻擊](ast-injection.md)，將會著重在原型鍊污染與 Pug 編譯環節產生的 AST 的相關攻擊。
 
 ## 參考
 - [維基百科：詞法分析](https://zh.wikipedia.org/wiki/%E8%AF%8D%E6%B3%95%E5%88%86%E6%9E%90)
