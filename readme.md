@@ -19,9 +19,15 @@
         - [污染 Object 的兩個選擇](#%E6%B1%A1%E6%9F%93-object-%E7%9A%84%E5%85%A9%E5%80%8B%E9%81%B8%E6%93%87)
         - [污染 pug.compiler](#%E6%B1%A1%E6%9F%93-pugcompiler)
         - [注入任意指令](#%E6%B3%A8%E5%85%A5%E4%BB%BB%E6%84%8F%E6%8C%87%E4%BB%A4)
+    - [實戰：把 flag 偷渡出來](#%E5%AF%A6%E6%88%B0%E6%8A%8A-flag-%E5%81%B7%E6%B8%A1%E5%87%BA%E4%BE%86)
+        - [嘗試使用 fetch](#%E5%98%97%E8%A9%A6%E4%BD%BF%E7%94%A8-fetch)
+        - [嘗試使用 curl](#%E5%98%97%E8%A9%A6%E4%BD%BF%E7%94%A8-curl)
+        - [嘗試從請求輸出](#%E5%98%97%E8%A9%A6%E5%BE%9E%E8%AB%8B%E6%B1%82%E8%BC%B8%E5%87%BA)
 - [雜談](#%E9%9B%9C%E8%AB%87)
 
 <!-- /TOC -->
+
+****
 
 ## 緣起
 因緣際會發現了一個網站，叫 [Hack The Box](https://app.hackthebox.com/home)。  
@@ -119,7 +125,7 @@ unflatten({
 console.log(polluted);
 ```
 
-在上述程式碼中，雖然 `polluted` 沒有定義，但是因爲 `polluted` 會被解釋成 `global.polluted`，而物件的原型鍊被污染 (所有物件的屬性都定義爲 `true`)，因此這裡看到的不是 `undefined` 而是 `true`。  
+在上述程式碼中，雖然 `polluted` 沒有定義，但是因爲 `polluted` 會被解釋成 `global.polluted`，而物件的原型鍊被污染 (所有物件的屬性 `polluted` 的預設值都定義爲 `true`)，因此這裡看到的不是 `undefined` 而是 `true`。  
 （註：這裡的 `global` 是物件，類似於瀏覽器的 `window` 物件）
 
 當時做到這裡時我就迫不及待想對 `String` 動手腳了，因爲在 [routes/index.js](gunship/challenge/routes/index.js) 裡，在 unflatten 之後最近的程式碼是 `<String>.includes()`，所以要是可以得逞的話，那這題是真的簡單。
@@ -162,7 +168,7 @@ router.post('/api/submit', (req, res) => {
 })();
 ```
 
-之後所有由瀏覽器發起的請求都使用上方模板，若有標註內容的必要，只會寫上 `data` 的內容。
+之後所有由瀏覽器發起的請求都使用上方模板，且只會寫上 `data` 的內容。
 
 #### 嘗試污染 String
 
@@ -199,7 +205,7 @@ let data = {
 #### 污染 Object 的兩個選擇
 既然只能污染 Object 的話，那現在有兩個選擇：
 1. `res.json()`  
-   來自 express 提供的 response 物件 res
+   來自 express 提供的 Response 物件 res
 2. `pug.compile()`  
    來自 pug 提供的 pug 物件
 
@@ -211,7 +217,10 @@ let data = {
 
 #### 污染 `pug.compiler()`
 此題最大魔王來了。  
-當時嘗試解決這題時，最開始我是使用靜態分析（翻譯：透過 vscode 的 F12 取得函式定義，然後拿關鍵字去搜原始碼，接著透過經驗去推測，以及一堆 console.log）  
+
+當時嘗試解決這題時，最開始我是使用靜態分析。  
+（翻譯：透過 vscode 的 F12 取得函式定義，然後拿關鍵字去搜原始碼，接著透過經驗去推測，以及一堆 console.log）  
+
 面對完全陌生的套件，以及龐大的架構，上述方法肯定是各種翻車。  
 （過程中一度看到什麼 Lexer, parser, AST 等等，這裡就省略萬字，不展開討論了）  
 ~~（反正我也是一知半解）~~  
@@ -222,7 +231,7 @@ let data = {
 正常狀況的 `node.line` 是數字：
 ![](images/5.png)
 （第 311 行執行變數 `js` 的組合，可以看到它直接加上 `node.line`）  
-（關於這個片段具體在幹嘛，晚點會在底下提供比較詳細的內容，這裡就先不展開）
+（關於這個片段具體在幹嘛，請參考 [附錄文章們](articles/readme.md)）
 
 原本應該要是 `undefined` 的，但是經過原型鍊污染後的 `node.line`：
 ![](images/6.png)
@@ -241,9 +250,10 @@ let data = {
 };
 ```
 
-#### 注入任意指令
 執行上述請求後，可以在終端機看到輸出 `pug pollution`，這表示污染成功。  
-再來就是嘗試執行指令，這裡可以透過 `process.mainModule.require('child_process').execSync('指令文字')` 來執行任意指令。  
+
+#### 注入任意指令
+接著是嘗試執行指令，這裡可以透過 `process.mainModule.require('child_process').execSync('指令文字')` 來執行任意指令。  
 
 實際的請求資料如下：
 [request-pug2.js](scripts/request-pug2.js)
@@ -259,6 +269,29 @@ let data = {
 ```
 執行結果：
 ![](images/7.png)
+（註：這是執行在 docker，而終端機輸出的 `----[routes]----` 是來自於我在 [routes/index.js](gunship/challenge/routes/index.js) 額外加上的，目的只是爲了分隔各個請求的記錄，無視即可。）
+
+### 實戰：把 flag 偷渡出來
+#### 嘗試使用 fetch
+興許是平常用瀏覽器寫 js 居多，當時我第一個想到用 ES6 的 `fetch()` 把關鍵內容推到 [pastebin](https://pastebin.com/) 之類的服務，這樣就能看到 flag 的內容了。   
+然而一試就知道這是不可行的，因爲 `fetch()` 在瀏覽器上才是原生功能
+，如果想要在 node.js 的環境上使用的話，必須安裝 `node-fetch` 套件。  
+爲了攻擊而安裝套件？這顯然不合理。
+
+#### 嘗試使用 curl
+`fetch` 不可行的話，那使用指令的 `curl` 呢？這東西應該是基本指令吧？  
+
+對不起我錯了。
+![](images/8.png)
+雖然理論上我應該可以透過指令安裝 `curl`，但是感覺這條路就不是正道，於是我選擇下面的方法。
+
+#### 嘗試從請求輸出
+既然我是透過請求發起這一串行爲的，那我應該可以在回覆動點手腳吧？  
+幸好，這次真的可以，而且後續回顧的話，我想這應該是題目作者想要我們做的方法。
+
+那，該怎麽做呢？
+
+
 
 
 
