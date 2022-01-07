@@ -1,0 +1,19 @@
+[
+    {
+        "type": "frute",
+        "name": "apple",
+        "quantity": 37,
+        "price": 24
+    },
+    {
+        "type": "frute",
+        "name": "banana",
+        "quantity": 101,
+        "price": 13
+    },
+    {
+        "type": "frute",
+        "name": "peach",
+        "price": 65
+    }
+]
