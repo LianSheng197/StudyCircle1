@@ -31,7 +31,7 @@
 ****
 
 ## 緣起
-因緣際會發現了一個網站，叫 [Hack The Box](https://app.hackthebox.com/home)。  
+因緣際會發現了一個網站，叫 [^Hack The Box](https://app.hackthebox.com/home)。  
 由於小時候就對資安攻防戰感到相當好奇，但一直不知道如何開始，也一直對其感到畏懼，這回看到這個網站時倍感驚豔，因此決定嘗試入門。  
 
 在做完幾個基本的教學關卡後，我決定嘗試一道挑戰題。  
@@ -41,18 +41,18 @@
 ### 釐清狀況
 剛開始我就愣住了，因爲下載必要文件時得到了一個壓縮檔，裡面看起來像是這個網站的原始碼...  
 大概是因爲這是我的第一個挑戰，所以很多題目的「基本設定」都還沒有概念，所以才有這個疑慮。  
-（原始碼放在 [gunship](./gunship/) 裡面）
+（原始碼放在 [gunship/](./gunship/) 裡面）
 ![](images/1.png)
 
 總之目標就是**從原始碼中嘗試找出可以利用的漏洞，然後取得 flag 即可**。
 
 ### 部署本機測試環境
 #### 方法一（HTB 原本設計的方法）
-這個並不難，只要在 Linux 環境並有安裝 docker 的情形下，在 [gunship](./gunship/) 裡面執行 `chmod +x build-docker.sh; ./build-docker.sh` 即可。  
+這個並不難，只要在 Linux 環境並有安裝 docker 的情形下，在 [gunship/](./gunship/) 裡面執行 `chmod +x build-docker.sh; ./build-docker.sh` 即可。  
 執行後即可在 `http://localhost:1337/` 看到網頁。
 
 #### 方法二（方便 debug 的方法）
-不想用 docker 也沒關係，在 [gunship/challenge](./gunship/challenge/) 底下直接 `npm i; npm run start` 也可以，不過別忘了 Node.js 的環境。  
+不想用 docker 也沒關係，在 [gunship/challenge/](./gunship/challenge/) 底下直接 `npm i; npm run start` 也可以，不過別忘了 Node.js 的環境。  
 執行後即可在 `http://localhost:1337/` 看到網頁。
 
 ![](images/2.png)
@@ -78,7 +78,7 @@
 #### 原型鍊污染
 看了一下上述漏洞，可以知道這題的解法是透過原型鍊污染 (Prototype Pollution) 達成的。關於這個手法，這裡簡單介紹一下：  
 
-先看底下的原始碼，這些範例都放在 [scripts](scripts/) 底下了。
+先看底下的原始碼，這些範例都放在 [scripts/](scripts/) 底下了。
 
 [pollution1.js](scripts/pollution1.js)
 ```js
